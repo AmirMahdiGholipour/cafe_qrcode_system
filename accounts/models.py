@@ -1,7 +1,9 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from common.models import TimeStampedModel
+from django.utils.text import slugify
 
-class CafeModel(models.Model):
+class CafeModel(TimeStampedModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100)
     logo = models.ImageField(upload_to='cafes/logos', null=True, blank=True)
@@ -18,3 +20,8 @@ class CafeModel(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name, allow_unicode=True)
+            super().save(*args, **kwargs)
