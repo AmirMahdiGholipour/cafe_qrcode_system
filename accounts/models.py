@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from common.models import TimeStampedModel
 from django.utils.text import slugify
+from django.contrib.auth.models import AbstractUser
 
 class CafeModel(TimeStampedModel):
     name = models.CharField(max_length=100)
@@ -26,3 +27,16 @@ class CafeModel(TimeStampedModel):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
+
+
+class CafeStaffModel(AbstractUser):
+
+    class StaffRole(models.TextChoices):
+        ADMIN = 'admin', 'Admin'
+        MANAGER = 'manager', 'Manager'
+        STAFF = 'staff', 'Staff'
+
+    cafe = models.ForeignKey(CafeModel, on_delete=models.CASCADE, null=True, blank=True, related_name='staff')
+    first_name = models.CharField(max_length=100, null=False, blank=False)
+    last_name = models.CharField(max_length=100, null=False, blank=False)
+    role = models.CharField(max_length=20, choices=StaffRole.choices, default=StaffRole.STAFF)
