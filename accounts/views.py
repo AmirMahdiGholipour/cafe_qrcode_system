@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework import status
-from serializers import CafeSerializer
+from .serializers import CafeSerializer
 
 
-class CafeView(APIView):
+class CafeAddView(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
