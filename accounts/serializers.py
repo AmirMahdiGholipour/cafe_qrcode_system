@@ -22,9 +22,9 @@ class CafeStaffSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'password','first_name', 'last_name', 'role', 'cafe']
         read_only_fields = ('id',)
 
-        def create(self, validated_data):
-            password = validated_data.pop('password')
-            user = CafeStaffModel(**validated_data)
-            user.set_password(password)
-            user.save()
-            return user
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = CafeStaffModel(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
