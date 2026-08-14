@@ -5,11 +5,12 @@ from django.utils.text import slugify
 
 class CafeModel(TimeStampedModel):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100)
-    logo = models.ImageField(upload_to='cafes/logos', null=True, blank=True)
-    cover_image = models.ImageField(upload_to='cafes/covers', null=True, blank=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    logo = models.ImageField(upload_to="cafes/logos/", null=True, blank=True)
+    cover_image = models.ImageField(upload_to="cafes/covers/", null=True, blank=True)
     primary_color = models.CharField(
         max_length=7,
+        default="#000000",
         validators=[
             RegexValidator(
                 regex=r'^#(?:[0-9a-fA-F]{3}){1,2}$',
@@ -24,4 +25,4 @@ class CafeModel(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
