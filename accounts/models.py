@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from common.models import TimeStampedModel
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 class CafeModel(TimeStampedModel):
     name = models.CharField(max_length=100)
@@ -30,13 +31,33 @@ class CafeModel(TimeStampedModel):
 
 
 class CafeStaffModel(AbstractUser):
+    class Gender(models.TextChoices):
+        MALE = "male", "مرد"
+        FEMALE = "female", "زن"
 
+    phone_number = models.CharField(
+        max_length=11, blank=True, null=True,
+        validators=[RegexValidator(r"^09\d{9}$", "Invalid phone number")],
+    )
+    national_code = models.CharField(
+        max_length=10, blank=True, null=True, unique=True,
+        validators=[RegexValidator(r"^\d{10}$", "National code must be 10 digit")],
+    )
+    address = models.CharField(max_length=255, blank=True, null=True)
+    province = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
+
+
+class CafeMembership(TimeStampedModel):
     class StaffRole(models.TextChoices):
-        ADMIN = 'admin', 'Admin'
-        MANAGER = 'manager', 'Manager'
-        STAFF = 'staff', 'Staff'
+        MANAGER = "manager", "Manager"
+        ADMIN = "admin", "Admin"
+        STAFF = "staff", "Staff"
 
-    cafe = models.ForeignKey(CafeModel, on_delete=models.CASCADE, null=True, blank=True, related_name='staff')
-    first_name = models.CharField(max_length=100, null=False, blank=False)
-    last_name = models.CharField(max_length=100, null=False, blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="memberships")
+    cafe = models.ForeignKey("accounts.CafeModel", on_delete=models.CASCADE, related_name="members")
     role = models.CharField(max_length=20, choices=StaffRole.choices, default=StaffRole.STAFF)
+
+    class Meta:
+        unique_together = ("user", "cafe")
