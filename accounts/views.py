@@ -9,7 +9,7 @@ from .models import CafeMembership
 from .serializers import CafeSerializer
 from rest_framework.generics import get_object_or_404
 from .models import CafeModel
-from .serializers import StaffCreateSerializer
+from .serializers import StaffCreateSerializer, StaffOutSerializer
 
 
 class SignupView(APIView):
@@ -59,4 +59,4 @@ class StaffAddView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        return Response(StaffCreateSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(StaffOutSerializer(user).data, status=status.HTTP_201_CREATED)

@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 from .models import CafeModel, CafeStaffModel, CafeMembership
 
 
@@ -11,9 +13,19 @@ class CafeSerializer(serializers.ModelSerializer):
 
 class SignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    national_code = serializers.CharField(
+        write_only=True,
+        min_length=10,
+        validators=[
+            UniqueValidator(
+                queryset=CafeStaffModel.objects.all(),
+                message="A use with this national code already exists."
+            )
+        ]
+    )
 
     class Meta:
-        model = CafeModel
+        model = CafeStaffModel
         fields = [
             'id', 'username', 'password', 'first_name', 'last_name',
             'phone_number', 'national_code', 'address', 'province', 'city', 'gender',
@@ -22,7 +34,6 @@ class SignupSerializer(serializers.ModelSerializer):
             "first_name": {'required': True},
             "last_name": {'required': True},
             "phone_number": {'required': True},
-            "national_code": {'required': True},
             "address": {'required': True},
             "province": {'required': True},
             "city": {'required': True},
@@ -59,8 +70,8 @@ class StaffCreateSerializer(SignupSerializer):
 
     def create(self, validated_data):
         role = validated_data.pop('role')
-        password = validated_data.pop('password')
-        cafe = self.context['cafe']
+        password = validated_data.pop("password")
+        cafe = self.context["cafe"]
 
         user = CafeStaffModel(**validated_data)
         user.set_password(password)
@@ -76,3 +87,8 @@ class CafeMembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = CafeMembership
         fields = ["id", "cafe", "cafe_name", "role", "created_at"]
+
+class StaffOutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CafeStaffModel
+        fields = ["id", "username", "first_name", "last_name"]

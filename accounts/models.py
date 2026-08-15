@@ -36,7 +36,7 @@ class CafeStaffModel(AbstractUser):
         FEMALE = "female", "زن"
 
     phone_number = models.CharField(
-        max_length=11, blank=True, null=True,
+        max_length=11, blank=True, null=True, unique=True,
         validators=[RegexValidator(r"^09\d{9}$", "Invalid phone number")],
     )
     national_code = models.CharField(
